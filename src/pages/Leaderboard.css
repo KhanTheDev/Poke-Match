@@ -1,0 +1,208 @@
+/* Styles for the Leaderboard page */
+.leaderboard-container {
+  min-height: 80vh;
+  padding: 20px;
+}
+
+.leaderboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.leaderboard-header h1 {
+  color: #FFD700;
+  font-size: 3rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.leaderboard-header p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #ccc;
+}
+
+/* Loading and error states */
+.loading, .error, .no-scores {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.loading h2, .error h2, .no-scores h2 {
+  color: #FFD700;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #FFD700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Scores table */
+.scores-table-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  overflow-x: auto;
+}
+
+.scores-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.scores-table th {
+  background: rgba(255, 215, 0, 0.2);
+  color: #FFD700;
+  padding: 15px 10px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.scores-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.scores-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Top three rows get special styling */
+.scores-table tr.top-three {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.05));
+}
+
+.scores-table tr.top-three:hover {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), rgba(255, 255, 255, 0.1));
+}
+
+/* Individual cell styles */
+.rank-cell {
+  text-align: center;
+  font-weight: bold;
+  width: 80px;
+}
+
+.medal {
+  font-size: 1.5rem;
+}
+
+.player-cell {
+  font-weight: bold;
+  color: #FFD700;
+}
+
+.time-cell {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.moves-cell {
+  text-align: center;
+  color: #2196F3;
+  font-weight: bold;
+}
+
+.difficulty-cell {
+  text-align: center;
+}
+
+.difficulty-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.difficulty-badge.easy {
+  background: #4CAF50;
+  color: white;
+}
+
+.difficulty-badge.medium {
+  background: #FF9800;
+  color: white;
+}
+
+.difficulty-badge.hard {
+  background: #F44336;
+  color: white;
+}
+
+.date-cell {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+/* Footer */
+.leaderboard-footer {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.leaderboard-footer p {
+  color: #FFD700;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .leaderboard-header h1 {
+    font-size: 2rem;
+  }
+  
+  .scores-table {
+    font-size: 0.9rem;
+  }
+  
+  .scores-table th,
+  .scores-table td {
+    padding: 8px 5px;
+  }
+  
+  .medal {
+    font-size: 1.2rem;
+  }
+  
+  .difficulty-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+}

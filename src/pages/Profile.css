@@ -1,0 +1,310 @@
+/* Styles for the Profile page */
+.profile-container {
+  min-height: 80vh;
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.profile-header h1 {
+  color: #FFD700;
+  font-size: 3rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Player name section */
+.player-name-section {
+  margin-top: 20px;
+}
+
+.name-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.name-display h2 {
+  color: white;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.name-edit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.name-input {
+  padding: 10px 15px;
+  border: 2px solid #FFD700;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 1.2rem;
+  text-align: center;
+  width: 250px;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.name-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.loading h2 {
+  color: #FFD700;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #FFD700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Statistics section */
+.stats-section {
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.stats-section h3 {
+  color: #FFD700;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: transform 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #FFD700;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #ccc;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Recent games section */
+.recent-games-section {
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.recent-games-section h3 {
+  color: #FFD700;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.no-games {
+  text-align: center;
+  padding: 40px;
+  color: #ccc;
+}
+
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.game-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: background 0.3s;
+}
+
+.game-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.game-rank {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #FFD700;
+  min-width: 40px;
+}
+
+.game-details {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.game-time, .game-moves {
+  color: white;
+  font-weight: bold;
+}
+
+.game-difficulty {
+  display: flex;
+  align-items: center;
+}
+
+.difficulty-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.difficulty-badge.easy {
+  background: #4CAF50;
+  color: white;
+}
+
+.difficulty-badge.medium {
+  background: #FF9800;
+  color: white;
+}
+
+.difficulty-badge.hard {
+  background: #F44336;
+  color: white;
+}
+
+.game-date {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+/* Profile actions */
+.profile-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.danger {
+  background: #F44336;
+}
+
+.danger:hover {
+  background: #d32f2f;
+}
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .profile-header h1 {
+    font-size: 2rem;
+  }
+  
+  .name-display h2 {
+    font-size: 1.5rem;
+  }
+  
+  .name-input {
+    width: 200px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .game-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .game-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .profile-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+}

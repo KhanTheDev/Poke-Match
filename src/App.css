@@ -1,0 +1,74 @@
+/* Styles for the main App component */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Button styles that we'll use throughout the app */
+.btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background: #45a049;
+}
+
+.btn-secondary {
+  background: #2196F3;
+}
+
+.btn-secondary:hover {
+  background: #1976D2;
+}
+
+/* Card styles for the memory game */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* Grid layout for the game cards */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 10px;
+  }
+  
+  .game-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}

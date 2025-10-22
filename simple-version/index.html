@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokéMatch - Memory Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 25%, #45B7D1 50%, #96CEB4 75%, #FFEAA7 100%);
+            background-size: 400% 400%;
+            animation: pokemonGradient 8s ease infinite;
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 20px 100px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes pokemonGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #FFD700;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF6347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pokemonTitle 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pokemonTitle {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* Conveyor belt with Pokemon */
+        .conveyor-belt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(90deg, #8B4513, #A0522D, #8B4513);
+            border-top: 4px solid #654321;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .conveyor-belt::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 20px,
+                rgba(255,255,255,0.1) 20px,
+                rgba(255,255,255,0.1) 21px
+            );
+        }
+
+        .pokemon-train {
+            position: absolute;
+            top: 10px;
+            left: -100px;
+            display: flex;
+            animation: pokemonMove 15s linear infinite;
+        }
+
+        @keyframes pokemonMove {
+            0% { left: -100px; }
+            100% { left: 100%; }
+        }
+
+        .pokemon-character {
+            width: 60px;
+            height: 60px;
+            margin-right: 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 3px solid #FFD700;
+            animation: pokemonBounce 1s ease-in-out infinite alternate;
+        }
+
+        .pokemon-character img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        @keyframes pokemonBounce {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-5px); }
+        }
+
+        .difficulty-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .difficulty-section h2 {
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-dropdown {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-select {
+            padding: 12px 20px;
+            border: 3px solid #FFD700;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+            min-width: 200px;
+        }
+
+        .difficulty-select:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.05);
+        }
+
+        .difficulty-select:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: #45a049;
+        }
+
+        .btn-secondary {
+            background: #2196F3;
+        }
+
+        .btn-secondary:hover {
+            background: #1976D2;
+        }
+
+        .game-container {
+            display: none;
+            text-align: center;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            width: 120px;
+            height: 150px;
+            perspective: 1000px;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        .card.matched .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-back,
+        .card-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 50%, #45B7D1 100%);
+            color: white;
+            border: 3px solid #FFD700;
+        }
+
+        .card-front {
+            background: white;
+            color: #333;
+            transform: rotateY(180deg);
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .question-mark {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .pokemon-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .pokemon-name {
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: capitalize;
+            color: #333;
+            margin: 0;
+            text-align: center;
+        }
+
+        .win-screen {
+            display: none;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .win-screen h1 {
+            color: #FFD700;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .win-stats {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .win-stats p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #FFD700;
+        }
+
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .card {
+                width: 100px;
+                height: 130px;
+            }
+            
+            .pokemon-image {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PokéMatch</h1>
+        <p>Test your memory with Pokemon cards!</p>
+    </div>
+
+    <div class="difficulty-section">
+        <h2>Choose Difficulty:</h2>
+        <div class="difficulty-dropdown">
+            <select class="difficulty-select" id="difficultySelect">
+                <option value="easy">Easy (4 pairs)</option>
+                <option value="medium">Medium (6 pairs)</option>
+                <option value="hard">Hard (8 pairs)</option>
+            </select>
+        </div>
+        <button class="btn" onclick="startGame()">Start Game!</button>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+        <div class="game-stats">
+            <div class="stat">
+                <div class="stat-label">Time:</div>
+                <div class="stat-value" id="timeDisplay">0:00</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Moves:</div>
+                <div class="stat-value" id="movesDisplay">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Matches:</div>
+                <div class="stat-value" id="matchesDisplay">0</div>
+            </div>
+        </div>
+        <div class="game-board" id="gameBoard"></div>
+        <button class="btn btn-secondary" onclick="resetGame()">Reset Game</button>
+    </div>
+
+    <div class="win-screen" id="winScreen">
+        <h1>🎉 Congratulations! 🎉</h1>
+        <h2>You Won!</h2>
+        <div class="win-stats">
+            <p id="winTime">Time: 0:00</p>
+            <p id="winMoves">Moves: 0</p>
+        </div>
+        <button class="btn" onclick="resetGame()">Play Again</button>
+    </div>
+
+    <!-- Conveyor belt with Pokemon characters -->
+    <div class="conveyor-belt">
+        <div class="pokemon-train" id="pokemonTrain">
+            <!-- Pokemon characters will be added here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let cards = [];
+        let flippedCards = [];
+        let matchedCards = [];
+        let moves = 0;
+        let time = 0;
+        let gameInterval;
+        let gameWon = false;
+
+        // Pokemon data from PokeAPI (first 20 Pokemon for variety)
+        const pokemonData = [
+            { id: 1, name: 'bulbasaur', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png' },
+            { id: 2, name: 'ivysaur', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png' },
+            { id: 3, name: 'venusaur', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png' },
+            { id: 4, name: 'charmander', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png' },
+            { id: 5, name: 'charmeleon', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png' },
+            { id: 6, name: 'charizard', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png' },
+            { id: 7, name: 'squirtle', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png' },
+            { id: 8, name: 'wartortle', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png' },
+            { id: 9, name: 'blastoise', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png' },
+            { id: 10, name: 'caterpie', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10.png' },
+            { id: 11, name: 'metapod', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/11.png' },
+            { id: 12, name: 'butterfree', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/12.png' },
+            { id: 13, name: 'weedle', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png' },
+            { id: 14, name: 'kakuna', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/14.png' },
+            { id: 15, name: 'beedrill', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/15.png' },
+            { id: 16, name: 'pidgey', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/16.png' },
+            { id: 17, name: 'pidgeotto', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png' },
+            { id: 18, name: 'pidgeot', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/18.png' },
+            { id: 19, name: 'rattata', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/19.png' },
+            { id: 20, name: 'raticate', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/20.png' },
+            { id: 21, name: 'spearow', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/21.png' },
+            { id: 22, name: 'fearow', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/22.png' },
+            { id: 23, name: 'ekans', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png' },
+            { id: 24, name: 'arbok', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/24.png' },
+            { id: 25, name: 'pikachu', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png' },
+            { id: 26, name: 'raichu', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/26.png' },
+            { id: 27, name: 'sandshrew', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/27.png' },
+            { id: 28, name: 'sandslash', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/28.png' },
+            { id: 29, name: 'nidoran-f', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/29.png' },
+            { id: 30, name: 'nidorina', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/30.png' }
+        ];
+
+        // Get difficulty setting
+        function getDifficulty() {
+            const selected = document.getElementById('difficultySelect');
+            return selected ? selected.value : 'easy';
+        }
+
+        // Get number of pairs based on difficulty
+        function getPairCount() {
+            const difficulty = getDifficulty();
+            switch (difficulty) {
+                case 'easy': return 4;
+                case 'medium': return 6;
+                case 'hard': return 8;
+                default: return 4;
+            }
+        }
+
+        // Start the game
+        function startGame() {
+            const difficulty = getDifficulty();
+            const pairCount = getPairCount();
+            
+            // Hide difficulty section and show game
+            document.querySelector('.difficulty-section').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            
+            // Reset game variables
+            cards = [];
+            flippedCards = [];
+            matchedCards = [];
+            moves = 0;
+            time = 0;
+            gameWon = false;
+            
+            // Create game cards
+            createCards(pairCount);
+            
+            // Start timer
+            startTimer();
+            
+            // Update display
+            updateDisplay();
+        }
+
+        // Create game cards
+        function createCards(pairCount) {
+            cards = [];
+            
+            // Select random Pokemon for this game
+            const selectedPokemon = pokemonData.slice(0, pairCount);
+            
+            // Create pairs
+            selectedPokemon.forEach((pokemon, index) => {
+                cards.push(
+                    { id: pokemon.id, name: pokemon.name, image: pokemon.image, uniqueId: `${pokemon.id}-1`, pairId: pokemon.id },
+                    { id: pokemon.id, name: pokemon.name, image: pokemon.image, uniqueId: `${pokemon.id}-2`, pairId: pokemon.id }
+                );
+            });
+            
+            // Shuffle cards
+            cards = cards.sort(() => Math.random() - 0.5);
+            
+            // Render cards
+            renderCards();
+        }
+
+        // Render cards on the board
+        function renderCards() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.onclick = () => handleCardClick(card.uniqueId);
+                
+                cardElement.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-back">
+                            <div class="question-mark">?</div>
+                        </div>
+                        <div class="card-front">
+                            <img src="${card.image}" alt="${card.name}" class="pokemon-image" onerror="this.src='https://via.placeholder.com/100x100/4CAF50/white?text=Pokemon'">
+                            <p class="pokemon-name">${card.name}</p>
+                        </div>
+                    </div>
+                `;
+                
+                gameBoard.appendChild(cardElement);
+            });
+        }
+
+        // Handle card click
+        function handleCardClick(cardId) {
+            if (gameWon) return;
+            if (flippedCards.includes(cardId) || matchedCards.includes(cardId)) return;
+            if (flippedCards.length >= 2) return;
+
+            flippedCards.push(cardId);
+            updateCardStates();
+
+            if (flippedCards.length === 2) {
+                moves++;
+                updateDisplay();
+                
+                const [firstId, secondId] = flippedCards;
+                const firstCard = cards.find(c => c.uniqueId === firstId);
+                const secondCard = cards.find(c => c.uniqueId === secondId);
+
+                if (firstCard.pairId === secondCard.pairId) {
+                    // Match found!
+                    matchedCards.push(firstId, secondId);
+                    flippedCards = [];
+                    updateCardStates();
+                    
+                    // Check for win
+                    if (matchedCards.length === cards.length) {
+                        gameWon = true;
+                        clearInterval(gameInterval);
+                        showWinScreen();
+                    }
+                } else {
+                    // No match, flip back after delay
+                    setTimeout(() => {
+                        flippedCards = [];
+                        updateCardStates();
+                    }, 1000);
+                }
+            }
+        }
+
+        // Update card visual states
+        function updateCardStates() {
+            const cardElements = document.querySelectorAll('.card');
+            cardElements.forEach((cardElement, index) => {
+                const card = cards[index];
+                cardElement.classList.remove('flipped', 'matched');
+                
+                if (flippedCards.includes(card.uniqueId)) {
+                    cardElement.classList.add('flipped');
+                }
+                if (matchedCards.includes(card.uniqueId)) {
+                    cardElement.classList.add('matched');
+                }
+            });
+        }
+
+        // Start timer
+        function startTimer() {
+            gameInterval = setInterval(() => {
+                time++;
+                updateDisplay();
+            }, 1000);
+        }
+
+        // Update display
+        function updateDisplay() {
+            document.getElementById('timeDisplay').textContent = formatTime(time);
+            document.getElementById('movesDisplay').textContent = moves;
+            document.getElementById('matchesDisplay').textContent = matchedCards.length / 2;
+        }
+
+        // Format time as minutes:seconds
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Show win screen
+        function showWinScreen() {
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            
+            document.getElementById('winTime').textContent = `Time: ${formatTime(time)}`;
+            document.getElementById('winMoves').textContent = `Moves: ${moves}`;
+        }
+
+        // Reset game
+        function resetGame() {
+            clearInterval(gameInterval);
+            
+            document.querySelector('.difficulty-section').style.display = 'block';
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'none';
+            
+            // Reset variables
+            cards = [];
+            flippedCards = [];
+            matchedCards = [];
+            moves = 0;
+            time = 0;
+            gameWon = false;
+        }
+
+        // Create conveyor belt with Pokemon characters
+        function createConveyorBelt() {
+            const pokemonTrain = document.getElementById('pokemonTrain');
+            pokemonTrain.innerHTML = '';
+            
+            // Select random Pokemon for the conveyor belt
+            const conveyorPokemon = pokemonData.slice(0, 8); // Show 8 Pokemon on the belt
+            
+            conveyorPokemon.forEach(pokemon => {
+                const pokemonDiv = document.createElement('div');
+                pokemonDiv.className = 'pokemon-character';
+                pokemonDiv.innerHTML = `<img src="${pokemon.image}" alt="${pokemon.name}" onerror="this.src='https://via.placeholder.com/50x50/4CAF50/white?text=P'">`;
+                pokemonTrain.appendChild(pokemonDiv);
+            });
+        }
+
+        // Initialize the game
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('PokéMatch game loaded!');
+            createConveyorBelt();
+        });
+    </script>
+</body>
+</html>

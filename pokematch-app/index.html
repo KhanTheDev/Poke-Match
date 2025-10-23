@@ -831,43 +831,62 @@
         <!-- Profile Page -->
         <div id="profile" class="page">
             <div class="profile-container">
-                <div class="profile-header">
-                    <h1>👤 Player Profile</h1>
-                    <h2 id="playerName">Pokemon Trainer</h2>
+                <!-- Login/Register Form (shown when no user) -->
+                <div id="authForm" class="profile-header" style="display: none;">
+                    <h1>👤 Create Account / Login</h1>
+                    <div style="max-width: 400px; margin: 20px auto;">
+                        <input type="text" id="usernameInput" placeholder="Username" 
+                               style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 2px solid #FFA500; font-size: 1.1rem;">
+                        <input type="email" id="emailInput" placeholder="Email" 
+                               style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 2px solid #FFA500; font-size: 1.1rem;">
+                        <button class="btn" onclick="createAccount()" style="width: 100%; margin-top: 15px;">Create Account</button>
+                        <p style="margin-top: 15px; color: #666;">Already have an account? Your username will log you in!</p>
+                    </div>
                 </div>
 
-                <div class="stats-section">
-                    <h3>📊 Your Statistics</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">🎮</div>
-                            <div class="stat-info">
-                                <div class="stat-value" id="totalGames">0</div>
-                                <div class="stat-label">Total Games</div>
+                <!-- User Profile (shown when logged in) -->
+                <div id="userProfile" style="display: none;">
+                    <div class="profile-header">
+                        <h1>👤 Player Profile</h1>
+                        <h2 id="playerName">Pokemon Trainer</h2>
+                        <p id="playerEmail" style="color: #ccc; margin-top: 10px;"></p>
+                        <button class="btn btn-secondary" onclick="logout()" style="margin-top: 15px;">Logout</button>
+                        <button class="btn" onclick="deleteAccount()" style="margin-top: 15px; background: #FF4444; margin-left: 10px;">Delete Account</button>
+                    </div>
+
+                    <div class="stats-section">
+                        <h3>📊 Your Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">🎮</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="totalGames">0</div>
+                                    <div class="stat-label">Total Games</div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">🏆</div>
-                            <div class="stat-info">
-                                <div class="stat-value" id="bestTime">N/A</div>
-                                <div class="stat-label">Best Time</div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">🏆</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="bestTime">N/A</div>
+                                    <div class="stat-label">Best Time</div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">⚡</div>
-                            <div class="stat-info">
-                                <div class="stat-value" id="bestMoves">N/A</div>
-                                <div class="stat-label">Best Moves</div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">⚡</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="bestMoves">N/A</div>
+                                    <div class="stat-label">Best Moves</div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">📈</div>
-                            <div class="stat-info">
-                                <div class="stat-value" id="averageTime">N/A</div>
-                                <div class="stat-label">Average Time</div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">📈</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="averageTime">N/A</div>
+                                    <div class="stat-label">Average Time</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -906,7 +925,7 @@
         ];
 
         // Navigation functions
-        function showPage(pageId) {
+        async function showPage(pageId) {
             // Hide all pages
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => page.classList.remove('active'));
@@ -917,13 +936,15 @@
             // Update navigation
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => link.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
             
             // Load data for specific pages
             if (pageId === 'leaderboard') {
-                loadLeaderboard();
+                await loadLeaderboard();
             } else if (pageId === 'profile') {
-                loadProfile();
+                await loadProfile();
             }
         }
 
@@ -1089,8 +1110,8 @@
         }
 
         // Leaderboard functions
-        function loadLeaderboard() {
-            const scores = getScores();
+        async function loadLeaderboard() {
+            const scores = await getScores();
             const tbody = document.getElementById('scoresTableBody');
             tbody.innerHTML = '';
             
@@ -1101,6 +1122,7 @@
             
             scores.forEach((score, index) => {
                 const row = document.createElement('tr');
+                const date = score.completedAt ? new Date(score.completedAt).toISOString().split('T')[0] : 'N/A';
                 row.innerHTML = `
                     <td class="rank-cell">
                         <span class="medal">${index < 3 ? ['🥇', '🥈', '🥉'][index] : `#${index + 1}`}</span>
@@ -1111,63 +1133,225 @@
                     <td class="difficulty-cell">
                         <span class="difficulty-badge ${score.difficulty}">${score.difficulty.charAt(0).toUpperCase() + score.difficulty.slice(1)}</span>
                     </td>
-                    <td>${score.date}</td>
+                    <td>${date}</td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
         // Profile functions
-        function loadProfile() {
-            const scores = getScores();
-            const totalGames = scores.length;
+        async function loadProfile() {
+            // Check if user is logged in
+            if (!currentUser) {
+                document.getElementById('authForm').style.display = 'block';
+                document.getElementById('userProfile').style.display = 'none';
+                return;
+            }
+            
+            // Show user profile
+            document.getElementById('authForm').style.display = 'none';
+            document.getElementById('userProfile').style.display = 'block';
+            
+            // Update profile info
+            document.getElementById('playerName').textContent = currentUser.username;
+            document.getElementById('playerEmail').textContent = currentUser.email;
+            
+            // Load stats from backend
+            await loadCurrentUser();
+            
+            const totalGames = currentUser.totalGames || 0;
+            const bestTime = currentUser.bestTime;
+            const bestMoves = currentUser.bestMoves;
             
             document.getElementById('totalGames').textContent = totalGames;
             
-            if (totalGames === 0) {
+            if (!bestTime) {
                 document.getElementById('bestTime').textContent = 'N/A';
                 document.getElementById('bestMoves').textContent = 'N/A';
                 document.getElementById('averageTime').textContent = 'N/A';
                 return;
             }
             
-            const times = scores.map(s => s.time);
-            const moves = scores.map(s => s.moves);
-            
-            const bestTime = Math.min(...times);
-            const bestMoves = Math.min(...moves);
-            const averageTime = Math.round(times.reduce((sum, time) => sum + time, 0) / totalGames);
-            
             document.getElementById('bestTime').textContent = formatTime(bestTime);
-            document.getElementById('bestMoves').textContent = bestMoves;
-            document.getElementById('averageTime').textContent = formatTime(averageTime);
+            document.getElementById('bestMoves').textContent = bestMoves || 'N/A';
+            
+            // Calculate average from user's scores
+            const scores = await getScores();
+            const userScores = scores.filter(s => s.playerName === currentUser.username);
+            if (userScores.length > 0) {
+                const times = userScores.map(s => s.time);
+                const averageTime = Math.round(times.reduce((sum, time) => sum + time, 0) / userScores.length);
+                document.getElementById('averageTime').textContent = formatTime(averageTime);
+            } else {
+                document.getElementById('averageTime').textContent = 'N/A';
+            }
         }
 
-        // Data functions
-        function getScores() {
-            const saved = localStorage.getItem('pokematch-scores');
-            if (saved) {
-                return JSON.parse(saved).sort((a, b) => {
-                    if (a.time !== b.time) return a.time - b.time;
-                    return a.moves - b.moves;
+        // Account management functions
+        async function createAccount() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const email = document.getElementById('emailInput').value.trim();
+            
+            if (!username || !email) {
+                alert('Please enter both username and email!');
+                return;
+            }
+            
+            try {
+                // Check if user exists
+                const checkResponse = await fetch(`${API_URL}/users`);
+                if (checkResponse.ok) {
+                    const users = await checkResponse.json();
+                    const existingUser = users.find(u => u.username === username);
+                    
+                    if (existingUser) {
+                        // Login existing user
+                        currentUser = existingUser;
+                        localStorage.setItem('pokematch-user', JSON.stringify(existingUser));
+                        alert(`Welcome back, ${username}!`);
+                        loadProfile();
+                        return;
+                    }
+                }
+                
+                // Create new user
+                const response = await fetch(`${API_URL}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email })
                 });
+                
+                if (response.ok) {
+                    const newUser = await response.json();
+                    currentUser = newUser;
+                    localStorage.setItem('pokematch-user', JSON.stringify(newUser));
+                    alert(`Account created! Welcome, ${username}!`);
+                    loadProfile();
+                } else {
+                    alert('Failed to create account. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error creating account:', error);
+                alert('Failed to create account. Make sure backend is running!');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('pokematch-user');
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('emailInput').value = '';
+            loadProfile();
+            alert('Logged out successfully!');
+        }
+
+        async function deleteAccount() {
+            if (!currentUser) return;
+            
+            if (!confirm(`Are you sure you want to delete your account? This cannot be undone!`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/users/${currentUser._id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('Account deleted successfully!');
+                    logout();
+                } else {
+                    alert('Failed to delete account. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                alert('Failed to delete account. Make sure backend is running!');
+            }
+        }
+
+        // Backend API URL
+        const API_URL = 'http://localhost:5000/api';
+        
+        // Current user
+        let currentUser = JSON.parse(localStorage.getItem('pokematch-user')) || null;
+
+        // Data functions
+        async function getScores() {
+            try {
+                const response = await fetch(`${API_URL}/scores`);
+                if (response.ok) {
+                    const scores = await response.json();
+                    return scores.sort((a, b) => {
+                        if (a.time !== b.time) return a.time - b.time;
+                        return a.moves - b.moves;
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching scores:', error);
             }
             return [];
         }
 
-        function saveScore() {
-            const scores = getScores();
+        async function saveScore() {
+            if (!currentUser) {
+                alert('Please create an account first!');
+                showPage('profile');
+                return;
+            }
+
             const newScore = {
-                id: Date.now(),
-                playerName: 'Pokemon Trainer',
+                playerName: currentUser.username,
                 time: time,
                 moves: moves,
-                difficulty: getDifficulty(),
-                date: new Date().toISOString().split('T')[0]
+                difficulty: getDifficulty()
             };
             
-            scores.push(newScore);
-            localStorage.setItem('pokematch-scores', JSON.stringify(scores));
+            try {
+                // Save score to backend
+                const response = await fetch(`${API_URL}/scores`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newScore)
+                });
+
+                if (response.ok) {
+                    // Update user stats
+                    await fetch(`${API_URL}/users/${currentUser._id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            bestTime: currentUser.bestTime ? Math.min(currentUser.bestTime, time) : time,
+                            bestMoves: currentUser.bestMoves ? Math.min(currentUser.bestMoves, moves) : moves,
+                            totalGames: (currentUser.totalGames || 0) + 1,
+                            gamesWon: (currentUser.gamesWon || 0) + 1
+                        })
+                    });
+                    
+                    // Refresh current user data
+                    await loadCurrentUser();
+                }
+            } catch (error) {
+                console.error('Error saving score:', error);
+                alert('Failed to save score. Make sure backend is running!');
+            }
+        }
+
+        async function loadCurrentUser() {
+            if (!currentUser || !currentUser._id) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/users`);
+                if (response.ok) {
+                    const users = await response.json();
+                    const user = users.find(u => u._id === currentUser._id);
+                    if (user) {
+                        currentUser = user;
+                        localStorage.setItem('pokematch-user', JSON.stringify(user));
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+            }
         }
 
         // Conveyor belt

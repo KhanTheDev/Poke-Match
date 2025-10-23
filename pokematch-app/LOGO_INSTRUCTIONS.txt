@@ -1,0 +1,18 @@
+TO ADD YOUR POKÉMATCH LOGO:
+
+1. Save your Pokématch logo image as "pokematch-logo.png"
+2. Place it in the same folder as index.html (pokematch-app folder)
+3. The app will automatically use your logo image
+4. If the image doesn't load, it will fall back to styled text
+
+Your logo should be:
+- PNG format (recommended)
+- Transparent background
+- High quality
+- Named exactly "pokematch-logo.png"
+
+The app is already set up to use your logo in:
+- Navigation bar (top left)
+- Home page title (main heading)
+
+Just drop your logo file in this folder and refresh the browser!

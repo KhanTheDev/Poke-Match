@@ -1,4 +1,4 @@
-# 🎮 PokéMatch – Pokémon Memory Game
+ 🎮 PokéMatch – Pokémon Memory Game
 
 A fun memory card game where you flip cards to find matching Pokémon pairs.  
 Built with **React**, this game helps you test your memory and enjoy real Pokémon characters!

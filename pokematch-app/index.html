@@ -1272,7 +1272,7 @@
             }
             
             try {
-                const response = await fetch(`${API_URL}/users/${currentUser._id}`, {
+                const response = await fetch(`${API_URL}/users/${currentUser.id}`, {
                     method: 'DELETE'
                 });
                 
@@ -1335,7 +1335,7 @@
 
                 if (response.ok) {
                     // Update user stats
-                    await fetch(`${API_URL}/users/${currentUser._id}`, {
+                    await fetch(`${API_URL}/users/${currentUser.id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -1356,13 +1356,13 @@
         }
 
         async function loadCurrentUser() {
-            if (!currentUser || !currentUser._id) return;
+            if (!currentUser || !currentUser.id) return;
             
             try {
                 const response = await fetch(`${API_URL}/users`);
                 if (response.ok) {
                     const users = await response.json();
-                    const user = users.find(u => u._id === currentUser._id);
+                    const user = users.find(u => u.id === currentUser.id);
                     if (user) {
                         currentUser = user;
                         localStorage.setItem('pokematch-user', JSON.stringify(user));
